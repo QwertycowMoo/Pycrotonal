@@ -70,8 +70,8 @@ Target Audience: Musicians
 |                                |        |                                                                                                                                                                                                                                          |
 
 Grading Template Links:
-(Week 1)[https://docs.google.com/spreadsheets/d/1tzTAX9tFxHbvWCDR5G_ZVpftYv6urMZ_IlgcIbvcQxM/edit?usp=sharing]
+[Week 1](https://docs.google.com/spreadsheets/d/1tzTAX9tFxHbvWCDR5G_ZVpftYv6urMZ_IlgcIbvcQxM/edit?usp=sharing)
 
-(Week 2)[https://docs.google.com/spreadsheets/d/1vdt2SnkPDcYIfjoazAjfRPtcZJdISaCoGx9ybnzF_z0/edit?usp=sharing]
+[Week 2](https://docs.google.com/spreadsheets/d/1vdt2SnkPDcYIfjoazAjfRPtcZJdISaCoGx9ybnzF_z0/edit?usp=sharing)
 
-(Week 3)[https://docs.google.com/spreadsheets/d/1B_bXreNge4Smk6w0DAA8bqfNxSQofaXvXi-DLhqPLJM/edit?usp=sharing]
+[Week 3](https://docs.google.com/spreadsheets/d/1B_bXreNge4Smk6w0DAA8bqfNxSQofaXvXi-DLhqPLJM/edit?usp=sharing)
