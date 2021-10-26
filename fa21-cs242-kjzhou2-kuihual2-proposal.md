@@ -19,6 +19,28 @@ Target Audience: Musicians
 * Limitations include my ability to work with a keyboard and make a musically viable interface for a microtonal keyboard
 
 ### GUI
+See File in Repo 
+
+### Timeline
+
+Week 1:
+- Set up basic GUI with all knobs for audio effects
+- Create synthesizer and connection to audio output
+- Implement FM, Reverb, and Distortion Effects
+- Should be able to play manually with tests and code injection
+
+Week 2:
+- Create mapping function for different Equal Divisions of the Octave
+- Listen for keyboard input (and MIDI if implementing)
+- Show fundemental frequency that synth is supposed to play 
+- Change mapping with command line
+
+Week 3:
+- Connect the keyboard input with the synthesizer
+- Show the key pressed and frequency played on the GUI
+- Show a visual representation of the EDO mapping on the GUI
+- Have polyphony for the instrument
+- Have an ADSR envelope for each note played
 
 ## Rubrics
 ### Week 1
