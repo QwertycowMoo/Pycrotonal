@@ -84,6 +84,7 @@ class Synth(abc.ABC):
         if value > 1:
             raise ValueError("Amplitude cannot be larger than 1!")
         self._amp = value
+        self._osc.setMul(self._amp)
 
     @abc.abstractmethod
     def get_synth(self):
