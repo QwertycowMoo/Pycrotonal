@@ -1,5 +1,4 @@
 """Main Control Loop for Pycrotonal"""
-import pyo
 import wx
 from src.gui import PycrotonalFrame
 
@@ -16,3 +15,8 @@ if __name__ == "__main__":
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
     ).Show()
     app.MainLoop()
+    # s = pyo.Server().boot()
+    # s.start()
+    # a = SineWave(440, .5)
+    # b = pyo.Disto(a.get_synth(), drive=.9, slope=0.9, mul=0.5).out()
+    # s.gui(locals())
