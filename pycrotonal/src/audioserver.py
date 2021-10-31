@@ -4,6 +4,7 @@ import pyo
 
 class AudioServer:
     """The main audio server that must be initialized before any sound objects created"""
+
     def __init__(self):
         """Constructor"""
         self.server = pyo.Server(sr=48000).boot()

@@ -22,7 +22,6 @@ TRIANGLE_INDEX = 2
 SAW_INDEX = 3
 FM_MAX_FREQ = 9000
 
-
 class PycrotonalFrame(wx.Frame):
     """Main Frame for Pycrotonal"""
 
@@ -115,19 +114,19 @@ class PycrotonalFrame(wx.Frame):
         self.lbl_fm_index = wx.StaticText(
             panel, label="FM Index: 0", style=wx.ALIGN_CENTER
         )
-        ctrl_fm_index = KnobCtrl(panel, size=wx.Size(100, 100))
-        ctrl_fm_index.SetTags(
+        self.ctrl_fm_index = KnobCtrl(panel, size=wx.Size(100, 100))
+        self.ctrl_fm_index.SetTags(
             range(0, 100, 10)
         )  # Index from 0 to 100, maybe make it bigger
-        ctrl_fm_index.SetAngularRange(-45, 225)
-        ctrl_fm_index.SetValue(0)
+        self.ctrl_fm_index.SetAngularRange(-45, 225)
+        self.ctrl_fm_index.SetValue(0)
         # Add listener
-        self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_fm_index_knob, ctrl_fm_index)
+        self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_fm_index_knob, self.ctrl_fm_index)
 
         # FM Freq
         fm_param_box.Add(self.lbl_fm_index, 0, wx.SHAPED | wx.TOP, 10)
-        fm_param_box.Add(ctrl_fm_index, 0, wx.SHAPED | wx.TOP, 20)
-        lbl_fm_freq = wx.StaticText(panel, label="FM Freq:", style=TE_PROCESS_ENTER)
+        fm_param_box.Add(self.ctrl_fm_index, 0, wx.SHAPED | wx.TOP, 20)
+        self.lbl_fm_freq = wx.StaticText(panel, label="FM Freq:", style=TE_PROCESS_ENTER)
         self.txt_fm_freq = wx.TextCtrl(panel, value="100")
         self.btn_fm_freq = wx.Button(panel, label="Set FM Freq")
         # Button listener
@@ -140,7 +139,7 @@ class PycrotonalFrame(wx.Frame):
         self.ctrl_fm_freq.SetValue(100)
         # Knob input listener
         self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_fm_freq_knob, self.ctrl_fm_freq)
-        fm_param_box.Add(lbl_fm_freq, 0, wx.SHAPED | wx.TOP, 10)
+        fm_param_box.Add(self.lbl_fm_freq, 0, wx.SHAPED | wx.TOP, 10)
         fm_param_box.Add(self.txt_fm_freq, 0, wx.SHAPED | wx.TOP, 5)
         fm_param_box.Add(self.btn_fm_freq, 0, wx.SHAPED | wx.TOP, 2)
         fm_param_box.Add(self.ctrl_fm_freq, 0, wx.SHAPED | wx.TOP, 20)
@@ -152,27 +151,27 @@ class PycrotonalFrame(wx.Frame):
         # Reverb
         rev_dist_param_box = wx.BoxSizer(wx.VERTICAL)
         self.lbl_reverb = wx.StaticText(panel, label="Reverb: 0", style=wx.ALIGN_CENTER)
-        ctrl_reverb = KnobCtrl(panel, size=(100, 100))
-        ctrl_reverb.SetTags(range(0, 100, 10))
-        ctrl_reverb.SetAngularRange(-45, 225)
-        ctrl_reverb.SetValue(0)
+        self.ctrl_reverb = KnobCtrl(panel, size=(100, 100))
+        self.ctrl_reverb.SetTags(range(0, 100, 10))
+        self.ctrl_reverb.SetAngularRange(-45, 225)
+        self.ctrl_reverb.SetValue(0)
         # Add listener
-        self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_reverb_knob, ctrl_reverb)
+        self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_reverb_knob, self.ctrl_reverb)
 
         # Distortion
         rev_dist_param_box.Add(self.lbl_reverb, 0, wx.SHAPED | wx.TOP, 10)
-        rev_dist_param_box.Add(ctrl_reverb, 0, wx.SHAPED | wx.TOP, 20)
+        rev_dist_param_box.Add(self.ctrl_reverb, 0, wx.SHAPED | wx.TOP, 20)
         self.lbl_dist = wx.StaticText(
             panel, label="Distortion: 0", style=wx.ALIGN_CENTER
         )
-        ctrl_dist = KnobCtrl(panel, size=(100, 100))
-        ctrl_dist.SetTags(range(0, 100, 10))
-        ctrl_dist.SetAngularRange(-45, 225)
-        ctrl_dist.SetValue(0)
+        self.ctrl_dist = KnobCtrl(panel, size=(100, 100))
+        self.ctrl_dist.SetTags(range(0, 100, 10))
+        self.ctrl_dist.SetAngularRange(-45, 225)
+        self.ctrl_dist.SetValue(0)
         # Add listener
-        self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_distortion_knob, ctrl_dist)
+        self.Bind(EVT_KC_ANGLE_CHANGED, self.handle_distortion_knob, self.ctrl_dist)
         rev_dist_param_box.Add(self.lbl_dist, 0, wx.SHAPED | wx.TOP, 10)
-        rev_dist_param_box.Add(ctrl_dist, 0, wx.SHAPED | wx.TOP, 20)
+        rev_dist_param_box.Add(self.ctrl_dist, 0, wx.SHAPED | wx.TOP, 20)
 
         params_box.Add(rev_dist_param_box, 0, wx.TOP | wx.EXPAND, 10)
         return params_box
@@ -180,12 +179,14 @@ class PycrotonalFrame(wx.Frame):
     def handle_fm_index_knob(self, event):
         """Handles the fm_index knob"""
         value = event.GetValue()
+        self.fm_index = value
         self.lbl_fm_index.SetLabel("FM Index: " + str(value))
         self.lbl_fm_index.Refresh()
 
     def handle_fm_freq_knob(self, event):
         """Handles the fm_freq knob"""
         value = event.GetValue()
+        self.fm_freq = value
         self.txt_fm_freq.SetValue(str(value))
         self.txt_fm_freq.Refresh()
 
@@ -195,6 +196,7 @@ class PycrotonalFrame(wx.Frame):
         try:
             value = int(self.txt_fm_freq.GetValue())
             if value > 0 & value < FM_MAX_FREQ:
+                self.fm_freq = value
                 self.ctrl_fm_freq.SetValue(int(value))
                 self.ctrl_fm_freq.Refresh()
         except ValueError:
