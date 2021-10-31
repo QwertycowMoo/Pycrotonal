@@ -1,6 +1,6 @@
 """Main Control Loop for Pycrotonal"""
 import wx
-from src.gui import PycrotonalFrame
+from .src.gui import PycrotonalFrame
 
 # First need to initialize sound objects and things to play
 # Then initialize gui and add all children to screen or something

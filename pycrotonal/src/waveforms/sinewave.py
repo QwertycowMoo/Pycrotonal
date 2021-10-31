@@ -17,9 +17,6 @@ class SineWave(Synth):
         self._distortion = 1
         self._reverb = 0
 
-    # def get_synth(self):
-    #     """Returns the oscillator to be played"""
-    #     return self._osc
-
     def get_harmonics(self):
+        """Returns the harmonic spectrum"""
         return self._freq

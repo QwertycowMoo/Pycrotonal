@@ -3,15 +3,15 @@ This module will apply the sound effects onto the original waveform"""
 import abc
 from pyo import PyoTableObject
 from pyo import PyoObject
-from pyo.lib.effects import Disto, Freeverb
 
 # pyo must start the server before anything else
 SAMPLE_RATE = 48000
 
+
 class Synth(abc.ABC):
     """Synth class that can later be subclassed into specific
     Implementation of waveforms"""
-    
+
     _wavetable: PyoTableObject
     _fm_amp: float
     _fm_index: float
@@ -73,7 +73,7 @@ class Synth(abc.ABC):
             raise ValueError("This is outside the range of hearing!")
         self._freq = value
         self._osc.setFreq(self._freq)
-        
+
     @property
     def amp(self):
         """Amplitude (loudness)"""
@@ -90,14 +90,12 @@ class Synth(abc.ABC):
     def get_synth(self):
         """Gets the pyo synth object, will need to be implemented
         in the subclasses"""
-        Disto(self._osc, drive=0.9, slope=0.9)
-        osc_dist = Disto(self._osc, drive=self.distortion, mul=self.amp)
-        # final_osc = Freeverb(osc_dist, bal=self.reverb)
         return self._osc
 
     @abc.abstractmethod
     def get_harmonics(self):
-        """Gets the harmonic spectrum of the synth for the FM synthesizer"""
+        """Gets the harmonic spectrum of the synth for the FM synthesizer
+        Might not be used?"""
 
 
 # Design: Likely create a synth object with waveform, FM params, Reverb, Distortion, ADSR
