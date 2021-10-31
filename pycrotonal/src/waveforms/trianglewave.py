@@ -1,7 +1,6 @@
 """Implementation of the Triangle Wave using PYO's RCOsc"""
 from pyo import Osc, TriangleTable
-from .synth import Synth
-from .synth import SAMPLE_RATE
+from .synth import Synth, SAMPLE_RATE
 
 
 class TriangleWave(Synth):

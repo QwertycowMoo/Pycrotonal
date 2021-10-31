@@ -1,7 +1,6 @@
 """Implementation of the Sawtooth Wave using PYO's Saw Table"""
 from pyo import SawTable, Osc
-from .synth import Synth
-from .synth import SAMPLE_RATE
+from .synth import Synth, SAMPLE_RATE
 
 
 class SawtoothWave(Synth):

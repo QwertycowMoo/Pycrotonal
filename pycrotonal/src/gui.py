@@ -12,15 +12,14 @@ from .waveforms.sawtoothwave import SawtoothWave
 
 from .audioserver import AudioServer
 
-# TODO: Implement selecting waveform
-# TODO: Implement tests
-# TODO: Apply FM modulation with a button
+# TODO: Apply FM modulation with a button, FM currently not working right now
 WAVEFORMS = ["Sine", "Square", "Triangle", "Saw"]
 SINE_INDEX = 0
 SQUARE_INDEX = 1
 TRIANGLE_INDEX = 2
 SAW_INDEX = 3
 FM_MAX_FREQ = 9000
+
 
 class PycrotonalFrame(wx.Frame):
     """Main Frame for Pycrotonal"""
@@ -91,6 +90,7 @@ class PycrotonalFrame(wx.Frame):
         title.SetFont(title_font)
         # WAVEFORM SELECTION
         wave_select = wx.Choice(panel, choices=WAVEFORMS)
+        wave_select.SetSelection(0)
         main_box.Add(wave_select, 0, wx.ALIGN_CENTER_HORIZONTAL, 10)
         self.Bind(EVT_CHOICE, self.handle_waveform_change, wave_select)
         # CONTROLS
@@ -126,7 +126,9 @@ class PycrotonalFrame(wx.Frame):
         # FM Freq
         fm_param_box.Add(self.lbl_fm_index, 0, wx.SHAPED | wx.TOP, 10)
         fm_param_box.Add(self.ctrl_fm_index, 0, wx.SHAPED | wx.TOP, 20)
-        self.lbl_fm_freq = wx.StaticText(panel, label="FM Freq:", style=TE_PROCESS_ENTER)
+        self.lbl_fm_freq = wx.StaticText(
+            panel, label="FM Freq:", style=TE_PROCESS_ENTER
+        )
         self.txt_fm_freq = wx.TextCtrl(panel, value="100")
         self.btn_fm_freq = wx.Button(panel, label="Set FM Freq")
         # Button listener
