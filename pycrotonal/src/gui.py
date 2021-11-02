@@ -5,6 +5,8 @@ from wx.lib.agw.knobctrl import KnobCtrl, EVT_KC_ANGLE_CHANGED
 from wx import EVT_CHOICE, EVT_BUTTON, TE_PROCESS_ENTER
 from pyo.lib.generators import FM, Sine
 from pyo.lib.effects import Disto, Freeverb
+from pyo.lib.wxgui import PyoGuiScope
+from pyo.lib.analysis import Scope
 from .waveforms.sinewave import SineWave
 from .waveforms.trianglewave import TriangleWave
 from .waveforms.squarewave import SquareWave
@@ -61,6 +63,8 @@ class PycrotonalFrame(wx.Frame):
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
 
+        
+
         # Putting fm synthesis on hold for right now
         # self.fm_synth = FM(carrier=self.synth.get_synth(), ratio=2, mul=0.4)
         self.is_playing = False
@@ -102,6 +106,10 @@ class PycrotonalFrame(wx.Frame):
         self.btn_toggle_synth = wx.Button(panel, label="Start Synth")
         self.btn_toggle_synth.Bind(EVT_BUTTON, self.handle_toggle_synth)
         main_box.Add(self.btn_toggle_synth, 0, wx.ALIGN_CENTER_HORIZONTAL, 2)
+
+        # Waveform oscilloscope
+        # self.osc_scope = PyoGuiScope(panel)
+        # main_box.Add(self.osc_scope, 0, wx.ALIGN_CENTER_HORIZONTAL, 2)
         panel.SetSizer(main_box)
         main_box.Layout()
 
