@@ -7,7 +7,9 @@ class SawtoothWave(Synth):
     """Triangle waveform"""
 
     def __init__(self, freq, amp):
-        """Constructor, uses SawTable to avoid aliasing with LinTable"""
+        """Constructor, uses SawTable to avoid aliasing with LinTable
+        Freq is fundemental frequency
+        Amp is amplitude (loudness)"""
         self.order = 25
         self._freq = freq
         self._amp = amp

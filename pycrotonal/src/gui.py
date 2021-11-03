@@ -33,6 +33,9 @@ class PycrotonalFrame(wx.Frame):
         While I would like for the reverb and distortion to be within the synth class,
         The knobs update the values and the AudioServer must be started before
         any PyoObjects can be made, so they must be instantiated after.
+
+        *args and **kw are there to extend the wx.Frame object, currently using 
+        title, size, and style. The c++ implementation uses flags, which is disgusting but workable.
         """
         super().__init__(*args, **kw)
         self.server = AudioServer()

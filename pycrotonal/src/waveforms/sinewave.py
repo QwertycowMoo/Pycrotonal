@@ -10,7 +10,9 @@ class SineWave(Synth):
     """Sinewave waveform"""
 
     def __init__(self, freq, amp):
-        """Constructor, uses the base harmonic table with 1 harmonic"""
+        """Constructor, uses the base harmonic table with 1 harmonic
+        Freq is fundemental frequency
+        Amp is amplitude (loudness)"""
         self._amp = amp
         self._freq = freq
         self._osc = Sine(freq=freq, mul=self._amp)

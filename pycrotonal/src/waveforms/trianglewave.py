@@ -7,7 +7,9 @@ class TriangleWave(Synth):
     """Triangle waveform"""
 
     def __init__(self, freq, amp):
-        """Constructor, uses RCOsc with 0 sharpness"""
+        """Constructor, uses RCOsc with 0 sharpness
+        Freq is fundemental frequency
+        Amp is amplitude (loudness)"""
         self._freq = freq
         self._amp = amp
         self._wavetable = TriangleTable(order=20)

@@ -8,7 +8,9 @@ class SquareWave(Synth):
     """Square waveform"""
 
     def __init__(self, freq, amp):
-        """Constructor, uses RCOsc with 1 sharpness"""
+        """Constructor, uses Squaretable to avoid aliasing 
+        Freq is fundemental frequency
+        Amp is amplitude (loudness)"""
         self._freq = freq
         self._amp = amp
         self._wavetable = SquareTable(order=25)
