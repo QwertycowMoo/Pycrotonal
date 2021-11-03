@@ -1,0 +1,9 @@
+[TYPECHECK]
+extension-pkg-allow-list=wx
+
+[MESSAGES CONTROL]
+
+disable=attribute-defined-outside-init, #This is keeping my __init__ function managable for the ui
+        fixme, #I will be using todos as a way to keep track of work
+        unused-argument, #This is for the wxpython method handlers
+        too-few-public-methods, #My synth classes are similar except in osc implementation
