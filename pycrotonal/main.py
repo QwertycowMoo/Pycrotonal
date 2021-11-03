@@ -1,7 +1,7 @@
 """Main Control Loop for Pycrotonal"""
 import wx
 from src.gui import PycrotonalFrame
-from pyo.lib.analysis import Scope
+# from pyo.lib.analysis import Scope
 # First need to initialize sound objects and things to play
 # Then initialize gui and add all children to screen or something
 # Then call app.MainLoop()

@@ -1,3 +1,4 @@
+"""Tests the GUI for interactivity"""
 import unittest
 import wx
 from wx.lib.agw.knobctrl import KnobCtrlEvent, EVT_KC_ANGLE_CHANGED
@@ -5,6 +6,7 @@ from src.gui import PycrotonalFrame
 
 
 class TestGUI(unittest.TestCase):
+    """Extends the unittest TestCase to test GUI functionality"""
     @classmethod
     def setUpClass(self) -> None:
         """Creates an app for the entire test suit to use"""
