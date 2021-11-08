@@ -1,24 +1,23 @@
 """Test for the keyinput class"""
 import time
 import unittest
-import threading
+from pynput.keyboard import Key, Controller
+from src.keyinput import Keyboard, SCALE_12_EDO, SCALE_36_EDO, SCALE_60_EDO
 
-import pynput
-from src.keyinput import Keyboard, SCALE_60_EDO
-from pynput.keyboard import Key, Controller, KeyCode
 
 
 class TestKeyboard(unittest.TestCase):
+    """Test the keyboard"""
     @classmethod
-    def setUpClass(self) -> None:
-        self.keyboard = Keyboard(440, 24)
-        self.controller = Controller()
-        self.keyboard.start_listening()
+    def setUpClass(cls) -> None:
+        """Creates a keyboard listener and controller"""
+        cls.keyboard = Keyboard(440, 24)
+        cls.controller = Controller()
+        cls.keyboard.start_listening()
 
     def test_a_keyinput(self):
         """Test any key input that there is a response"""
         self.controller.press("1")
-
         self.assertFalse(self.keyboard.get_freq() == -1, "check there is something")
 
     def test_a440_key(self):
@@ -29,76 +28,33 @@ class TestKeyboard(unittest.TestCase):
         self.assertEqual(self.keyboard.get_freq(), 440)
 
     def test_press_outside_scale(self):
+        """Try to push a key outside the constructed scale"""
         self.controller.press('d')
         time.sleep(1)
         self.controller.release('d')
         self.assertEqual(self.keyboard.get_freq(), -1)
 
     def test_press_inside_scale(self):
+        """Try to press something inside the scale"""
         self.controller.press('2')
         time.sleep(1)
         self.controller.release('2')
         self.assertAlmostEqual(self.keyboard.get_freq(), 479.8234)
-        
+      
     def test_12edo_keyscale(self):
+        """Create a 12 edo keyscale"""
         keyscale = self.keyboard.find_key_scale(12)
         self.assertEqual(
             keyscale,
-            [
-                Key.f1,
-                Key.f2,
-                Key.f3,
-                Key.f4,
-                Key.f5,
-                Key.f6,
-                Key.f7,
-                Key.f8,
-                Key.f9,
-                Key.f10,
-                Key.f11,
-                Key.f12,
-            ],
+            SCALE_12_EDO,
         )
 
     def test_33edo_keyscale(self):
+        """Create a 33 edo keyscale"""
         keyscale = self.keyboard.find_key_scale(33)
         self.assertEqual(
             keyscale,
-            [
-                Key.f1,
-                KeyCode.from_char("1"),
-                KeyCode.from_char("q"),
-                Key.f2,
-                KeyCode.from_char("2"),
-                KeyCode.from_char("w"),
-                Key.f3,
-                KeyCode.from_char("3"),
-                KeyCode.from_char("e"),
-                Key.f4,
-                KeyCode.from_char("4"),
-                KeyCode.from_char("r"),
-                Key.f5,
-                KeyCode.from_char("5"),
-                KeyCode.from_char("t"),
-                Key.f6,
-                KeyCode.from_char("6"),
-                KeyCode.from_char("y"),
-                Key.f7,
-                KeyCode.from_char("7"),
-                KeyCode.from_char("u"),
-                Key.f8,
-                KeyCode.from_char("8"),
-                KeyCode.from_char("i"),
-                Key.f9,
-                KeyCode.from_char("9"),
-                KeyCode.from_char("o"),
-                Key.f10,
-                KeyCode.from_char("0"),
-                KeyCode.from_char("p"),
-                Key.f11,
-                KeyCode.from_char("-"),
-                KeyCode.from_char("["),
-            ],
+            SCALE_36_EDO[0:33]
         )
 
     def test_60edo_keyscale(self):

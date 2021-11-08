@@ -16,13 +16,13 @@ class TestSynths(unittest.TestCase):
         """Test the sine harmonics, should just be 1"""
 
         sine = SineWave(100, 0.5)
-        assert sine.get_harmonics() == 100
+        self.assertEqual(sine.get_harmonics(), 100)
 
     def test_square_harmonics(self):
         """Test the square wave harmonics, should be odd harmonics up until the nyquist limit
         w/amplitude of 1/n"""
         square = SquareWave(1000, 0.5)
-        assert square.get_harmonics() == (
+        self.assertEqual(square.get_harmonics(), (
             [
                 1000,
                 3000,
@@ -51,13 +51,13 @@ class TestSynths(unittest.TestCase):
                 0.047619047619047616,
                 0.043478260869565216,
             ],
-        )
+        ))
 
     def test_triangle_harmonics(self):
         """Test the square wave harmonics, should be odd harmonics up until the nyquist limit
         w/amplitude of 1/n^2"""
         triangle = TriangleWave(1000, 0.5)
-        assert triangle.get_harmonics() == (
+        self.assertEqual(triangle.get_harmonics(), (
             [1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000, 17000, 19000],
             [
                 1.0,
@@ -71,13 +71,13 @@ class TestSynths(unittest.TestCase):
                 0.0034602076124567475,
                 0.002770083102493075,
             ],
-        )
+        ))
 
     def test_sawtooth_harmonics(self):
         """Test the square wave harmonics, should be all harmonics up until the nyquist limit
         w/amplitude of 1/n"""
         saw = SawtoothWave(1000, 0.5)
-        assert saw.get_harmonics() == (
+        self.assertEqual(saw.get_harmonics(), (
             [
                 1000,
                 2000,
@@ -130,7 +130,7 @@ class TestSynths(unittest.TestCase):
                 0.043478260869565216,
                 0.041666666666666664,
             ],
-        )
+        ))
 
 
 if __name__ == "__main__":

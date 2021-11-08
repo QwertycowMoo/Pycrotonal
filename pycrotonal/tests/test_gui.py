@@ -9,19 +9,20 @@ class TestGUI(unittest.TestCase):
     """Extends the unittest TestCase to test GUI functionality"""
 
     @classmethod
-    def setUpClass(self) -> None:
+    def setUpClass(cls) -> None:
         """Creates an app for the entire test suit to use"""
-        self.app = wx.App()
-        self.frame = PycrotonalFrame(
+        cls.app = wx.App()
+        cls.frame = PycrotonalFrame(
             None,
             title="Pycrotonal",
             size=wx.Size(700, 500),
             style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
         )
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         """Destroys the frame, but does not shut down audio server"""
-        self.frame.Destroy()
+        cls.frame.Destroy()
 
     def test_a_init(self):
         """Tests initialization. Has 'a' in it so that it runs first before any

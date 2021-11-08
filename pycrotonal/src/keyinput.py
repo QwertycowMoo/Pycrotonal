@@ -1,8 +1,7 @@
 """Keyboard Listener"""
+from queue import Queue, Empty
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
-from numpy import power
-from queue import Queue, Empty
 from .freqhelper import find_scale
 
 # This was the best way to implement the most amount of flexibility.
@@ -221,6 +220,7 @@ class Keyboard:
         )
 
     def on_press(self, key):
+        """on press handler"""
         self.msg_queue.put(key)
         try:
             print("alphanumeric key {0} pressed".format(key.vk))
@@ -228,12 +228,14 @@ class Keyboard:
             print("special key {0} pressed".format(key))
 
     def on_release(self, key):
+        """on release handler"""
         print("{0} released".format(key))
         if key == keyboard.Key.esc:
             # Stop listener
             return False
 
     def start_listening(self):
+        """Listen to keyboard"""
         self.listener.start()
 
     def find_key_scale(self, edo):
@@ -242,16 +244,16 @@ class Keyboard:
             raise ValueError("This is not a valid edo")
         if edo <= 12:
             return SCALE_12_EDO[0:edo]
-        elif edo <= 24:
+        if edo <= 24:
             return SCALE_24_EDO[0:edo]
-        elif edo <= 36:
+        if edo <= 36:
             return SCALE_36_EDO[0:edo]
-        elif edo <= 48:
+        if edo <= 48:
             return SCALE_48_EDO[0:edo]
-        elif edo <= 60:
+        if edo <= 60:
             return SCALE_60_EDO[0:edo]
-            
         raise ValueError("This is not a valid edo")
+        
     def get_freq(self):
         """Allows GUI to get frequency associated with keypress in a (kind of) async way"""
         try:

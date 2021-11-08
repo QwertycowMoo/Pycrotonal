@@ -1,11 +1,12 @@
 """Test for the frequency helper class"""
 import unittest
-import sys
 from src.freqhelper import find_scale, find_next_step
 
 
 class TestScales(unittest.TestCase):
+    """Test the frequency scale constructor"""
     def test_find_next_step_12_edo(self):
+        """Test the next step in a 12 edo scale"""
         a_sharp = find_next_step(440, 12)
         self.assertAlmostEqual(a_sharp, 466.1637615)
 
