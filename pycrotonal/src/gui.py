@@ -1,5 +1,6 @@
 """GUI class for wx Frame"""
 import sys
+from pynput.keyboard import Key
 import wx
 from wx.lib.agw.knobctrl import KnobCtrl, EVT_KC_ANGLE_CHANGED
 from wx import EVT_CHOICE, EVT_BUTTON, TE_PROCESS_ENTER
@@ -13,6 +14,7 @@ from .waveforms.squarewave import SquareWave
 from .waveforms.sawtoothwave import SawtoothWave
 
 from .audioserver import AudioServer
+from .keyinput import Keyboard
 
 # TODO: Apply FM modulation with a button, FM currently not working right now
 WAVEFORMS = ["Sine", "Square", "Triangle", "Saw"]
@@ -34,13 +36,16 @@ class PycrotonalFrame(wx.Frame):
         The knobs update the values and the AudioServer must be started before
         any PyoObjects can be made, so they must be instantiated after.
 
-        *args and **kw are there to extend the wx.Frame object, currently using 
+        *args and **kw are there to extend the wx.Frame object, currently using
         title, size, and style. The c++ implementation uses flags, which is disgusting but workable.
         """
         super().__init__(*args, **kw)
         self.server = AudioServer()
         # How do we have polyphony
         # Dynamically create synths on the fly?
+        self.keyboard = Keyboard(440, 60)
+        self.keyboard.start_listening()
+
         # Distortion has set params, can only control drive amount and not clip function
         self.distortion = 0
         # Reverb has set params, can only control dry/wet for now
@@ -65,8 +70,6 @@ class PycrotonalFrame(wx.Frame):
             self.final_synth = Freeverb(
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
-
-        
 
         # Putting fm synthesis on hold for right now
         # self.fm_synth = FM(carrier=self.synth.get_synth(), ratio=2, mul=0.4)

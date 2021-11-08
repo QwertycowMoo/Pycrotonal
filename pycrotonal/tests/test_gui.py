@@ -7,6 +7,7 @@ from src.gui import PycrotonalFrame
 
 class TestGUI(unittest.TestCase):
     """Extends the unittest TestCase to test GUI functionality"""
+
     @classmethod
     def setUpClass(self) -> None:
         """Creates an app for the entire test suit to use"""

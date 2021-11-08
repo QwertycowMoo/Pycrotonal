@@ -1,6 +1,7 @@
 """Main Control Loop for Pycrotonal"""
 import wx
 from src.gui import PycrotonalFrame
+
 # from pyo.lib.analysis import Scope
 # First need to initialize sound objects and things to play
 # Then initialize gui and add all children to screen or something
@@ -15,6 +16,7 @@ if __name__ == "__main__":
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
     )
     app.MainLoop()
+
     # s = pyo.Server().boot()
     # s.start()
     # a = SineWave(440, .5)
