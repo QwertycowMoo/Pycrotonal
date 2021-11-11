@@ -3,6 +3,7 @@ This module will apply the sound effects onto the original waveform"""
 import abc
 from pyo import PyoTableObject
 from pyo import PyoObject
+import time
 
 # pyo must start the server before anything else
 SAMPLE_RATE = 48000
@@ -17,7 +18,7 @@ class Synth(abc.ABC):
     _fm_index: float
     _reverb: float
     _distortion: float
-    _amp: float
+    _adsr: PyoObject
     _osc: PyoObject
 
     @property
@@ -75,25 +76,33 @@ class Synth(abc.ABC):
         self._osc.setFreq(self._freq)
 
     @property
-    def amp(self):
+    def adsr(self):
         """Amplitude (loudness)"""
-        return self._amp
+        return self._adsr
 
-    @amp.setter
-    def amp(self, value):
+    @adsr.setter
+    def adsr(self, value):
+        # TODO: Test this
         """amp setter, limits at 1"""
         if not isinstance(value, PyoObject):
-            if value > 1:
-                raise ValueError("Amplitude cannot be larger than 1!")
-        print(value)
-        self._amp = value
-        self._osc.setMul(self._amp)
+            raise ValueError("Amplitude must be a ADSR PyoObject")
+        self._adsr = value
+        self._osc.setMul(self._adsr)
 
     def get_synth(self):
         """Gets the pyo synth object, will need to be implemented
         in the subclasses"""
         return self._osc
 
+    def play(self):
+        self._osc.out()
+        print(self._adsr.__dir__)
+        self._adsr.play()
+        
+    def stop(self):
+        self._adsr.stop()
+        # self._osc.stop()
+        
     @abc.abstractmethod
     def get_harmonics(self):
         """Gets the harmonic spectrum of the synth for the FM synthesizer

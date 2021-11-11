@@ -1,6 +1,7 @@
 """GUI class for wx Frame"""
 import sys
 import threading
+from pynput import keyboard
 from pynput.keyboard import Key
 from pyo.lib.controls import Adsr
 import wx
@@ -9,6 +10,7 @@ from wx.lib.agw.knobctrl import KnobCtrl, EVT_KC_ANGLE_CHANGED
 from wx import EVT_CHOICE, EVT_BUTTON, TE_PROCESS_ENTER
 from pyo.lib.generators import FM, Sine
 from pyo.lib.effects import Disto, Freeverb
+from musx import rescale
 from .waveforms.sinewave import SineWave
 from .waveforms.trianglewave import TriangleWave
 from .waveforms.squarewave import SquareWave
@@ -43,10 +45,15 @@ class PycrotonalFrame(wx.Frame):
         super().__init__(*args, **kw)
         self.server = AudioServer()
         # How do we have polyphony
-        # Dynamically create synths on the fly?
-        self.keyboard = Keyboard(440, 60)
+        # If have all synths in array, then call adsr play() on them, they are always running
+        # Don't have to dynamically create synths, only have to call stop() on the synth itself to save CPU 
+        self.edo = 60
+        self.keyboard = Keyboard(440, self.edo)
         self.keyboard.start_listening()
-
+        
+        # mix can mix a list of pyoObjects to save reverb/dist computation cost
+        
+            
         # Distortion has set params, can only control drive amount and not clip function
         self.distortion = 0
         # Reverb has set params, can only control dry/wet for now
@@ -55,11 +62,20 @@ class PycrotonalFrame(wx.Frame):
         self.apply_fm = False
 
         self.synth = SineWave(440, 0.3)
-        # self.adsr = Adsr()
-        # self.synth.amp = self.adsr
+        self.adsr = Adsr(attack=0.01, decay=0.01, release=0.01)
+        self.synth.adsr = self.adsr
+        
+        # Have array of independent adsr so that each note has its own envelope
+        self.adsr_arr = [Adsr(attack=0.01, decay=0.01, release=0.01, mul=0.2) for _ in range(self.edo)]
+        # Create all synths and so when the key is pressed, it starts the synth associated with the key
+        self.synths = {key: SineWave(freq, self.adsr_arr[i]) for i, (key, freq) in enumerate(self.keyboard.get_scale())}
+        # TODO: apply mix onto all synths so it can be reverb and distortioned
+        # TODO: Allow change of waveforms
+        
         self.fm_ratio = self.fm_freq / 440
         self.fm_index = 1
         if self.apply_fm:
+            # Putting fm synthesis on hold for right now
             self.fm_synth = FM(carrier=Sine())
             # So there's sound if you really listen hard but not usable
             self.dist_effect = Disto(self.fm_synth, drive=self.distortion, slope=0.8)
@@ -73,9 +89,7 @@ class PycrotonalFrame(wx.Frame):
             self.final_synth = Freeverb(
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
-
-        # Putting fm synthesis on hold for right now
-        # self.fm_synth = FM(carrier=self.synth.get_synth(), ratio=2, mul=0.4)
+            
         self.is_playing = False
         self.server.play()
         self.init_ui()
@@ -84,10 +98,10 @@ class PycrotonalFrame(wx.Frame):
         self.Center()
         self.Show()
 
-        # Start a new thread to get frequencies
+        # Start a new thread to get keypresses
         # Has daemon=True so it also shuts down when main loop stops
-        thrd_freq = threading.Thread(target=self.get_frequencies, daemon=True)
-        thrd_freq.start()
+        thrd_keypress = threading.Thread(target=self.get_keypress, daemon=True)
+        thrd_keypress.start()
         
     def on_exit(self, event):
         """Stops the audio server on exit"""
@@ -116,11 +130,6 @@ class PycrotonalFrame(wx.Frame):
 
         main_box.Add(params_box, 0, wx.ALL | wx.EXPAND, 10)
 
-        # BUTTON to control synth
-        self.btn_toggle_synth = wx.Button(panel, label="Start Synth")
-        self.btn_toggle_synth.Bind(EVT_BUTTON, self.handle_toggle_synth)
-        main_box.Add(self.btn_toggle_synth, 0, wx.ALIGN_CENTER_HORIZONTAL, 2)
-        
         self.lbl_frequency = wx.StaticText(panel, label="Frequency:", style=wx.ALIGN_CENTER)
         main_box.Add(self.lbl_frequency, 0, wx.ALIGN_CENTER_HORIZONTAL, 20)
         frequency_font = wx.Font(
@@ -290,13 +299,13 @@ class PycrotonalFrame(wx.Frame):
             self.is_playing = False
         else:
             print("yes")
-            self.play_synth()
+            self.start_synth()
             self.is_playing = True
 
     def handle_waveform_change(self, event):
         """Handles the waveform selection change and creates new synth objects"""
         if event.GetSelection() == SINE_INDEX:
-            self.synth = SineWave(440, 0.5)
+            self.synth = SineWave(440, self.adsr)
             self.dist_effect = Disto(
                 self.synth.get_synth(), drive=self.distortion, slope=0.8
             )
@@ -304,7 +313,7 @@ class PycrotonalFrame(wx.Frame):
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
         elif event.GetSelection() == SQUARE_INDEX:
-            self.synth = SquareWave(440, 0.3)
+            self.synth = SquareWave(440, self.adsr)
             self.dist_effect = Disto(
                 self.synth.get_synth(), drive=self.distortion, slope=0.8
             )
@@ -312,7 +321,7 @@ class PycrotonalFrame(wx.Frame):
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
         elif event.GetSelection() == TRIANGLE_INDEX:
-            self.synth = TriangleWave(440, 0.5)
+            self.synth = TriangleWave(440, self.adsr)
             self.dist_effect = Disto(
                 self.synth.get_synth(), drive=self.distortion, slope=0.8
             )
@@ -320,7 +329,7 @@ class PycrotonalFrame(wx.Frame):
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
         elif event.GetSelection() == SAW_INDEX:
-            self.synth = SawtoothWave(440, 0.3)
+            self.synth = SawtoothWave(440, self.adsr)
             self.dist_effect = Disto(
                 self.synth.get_synth(), drive=self.distortion, slope=0.8
             )
@@ -329,39 +338,53 @@ class PycrotonalFrame(wx.Frame):
             )
 
     def handle_attack_change(self, event):
-        print("attack", self.attack_slider.GetValue())
+        attack = self.attack_slider.GetValue()
+        attack = rescale(attack, 0, 100, 0, 10, mode='exp')
+        for adsr in self.adsr_arr:
+            adsr.setAttack(attack)
     
     def handle_decay_change(self, event):
-        print("decay", self.decay_slider.GetValue())
+        decay = self.decay_slider.GetValue()
+        decay = rescale(decay, 0, 100, 0, 10, mode='exp')
+        print("decay", decay)
+        for adsr in self.adsr_arr:
+            adsr.setDecay(decay)
     
     def handle_sustain_change(self, event):
-        print("sustain", self.sustain_slider.GetValue())
+        sustain = self.sustain_slider.GetValue()
+        sustain = rescale(sustain, 0, 100, 0, 10, mode='exp')
+        for adsr in self.adsr_arr:
+            adsr.setSustain(sustain)
         
     def handle_release_change(self, event):
-        print("release", self.release_slider.GetValue())
-    
-    def play_synth(self):
-        """Starts the Synth"""
-        self.synth.get_synth().play()
-        self.final_synth.out()
+        release = self.release_slider.GetValue()
+        release = rescale(release, 0, 100, 0, 10, mode='exp')
+        for adsr in self.adsr_arr:
+            adsr.setRelease(release)
+        
+    # def start_synth(self):
+    #     """Starts the Synth"""
+    #     self.final_synth.out()
+    #     self.synth.adsr.play()
+        
 
-    def stop_synth(self):
-        """Stops the Synth"""
-        self.synth.get_synth().stop()
-        self.final_synth.stop()
+    # def stop_synth(self):
+    #     """Stops the Synth"""
+    #     # self.final_synth.stop()
+    #     self.synth.adsr.stop()
 
-    def get_frequencies(self):
+    def get_keypress(self):
         while True:
-            # TODO: Need to check if this actually works or need to call a "set freq()" function
             # Implement an array where we can construct the synths dynamically
             # Maybe just have them running at 0 amp
             # Also need wxpython input for edo
-            # Also need wxpython showing frequency played
             try:
-                freq = self.keyboard.get_freq()
-                print(freq)
-                self.lbl_frequency.SetLabel("Frequency: " + str(freq))
-                self.synth.freq = freq
+                key, freq, msg = self.keyboard.get_keypress()
+                if msg == "start":
+                    self.lbl_frequency.SetLabel("Frequency: " + str(freq))
+                    self.synths[key].play()
+                elif msg == "stop":
+                    self.synths[key].stop()
             except ValueError as e:
                 print(e)
     

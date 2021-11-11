@@ -47,7 +47,7 @@ SCALE_24_EDO = [
     Key.f11,
     KeyCode.from_char("-"),
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),
 ]
 
 SCALE_36_EDO = [
@@ -85,7 +85,7 @@ SCALE_36_EDO = [
     KeyCode.from_char("-"),
     KeyCode.from_char("["),
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),
     KeyCode.from_char("]"),
 ]
 
@@ -135,7 +135,7 @@ SCALE_48_EDO = [
     KeyCode.from_char("["),
     KeyCode.from_char("'"),
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),
     KeyCode.from_char("]"),
     KeyCode.from_char("\\"),  # \
 ]
@@ -221,7 +221,7 @@ class Keyboard:
 
     def on_press(self, key):
         """on press handler"""
-        self.msg_queue.put(key)
+        self.msg_queue.put((key, "start"))
         # try:
         #     print("alphanumeric key {0} pressed".format(key))
         # except AttributeError:
@@ -230,6 +230,7 @@ class Keyboard:
     def on_release(self, key):
         """on release handler"""
         # print("{0} released".format(key))
+        self.msg_queue.put((key, "stop"))
         if key == keyboard.Key.esc:
             # Stop listener
             return False
@@ -254,15 +255,20 @@ class Keyboard:
             return SCALE_60_EDO[0:edo]
         raise ValueError("This is not a valid edo")
         
-    def get_freq(self):
-        """Allows GUI to get frequency associated with keypress in a (kind of) async way"""
+    def get_scale(self):
+        """Return a list of tuples of keyboard key and frequency"""
+        return zip(self.key_scale, self.freq_scale)
+    
+    def get_keypress(self):
+        """Allows GUI to get frequency associated with keypress in a (kind of) async way
+        returns the frequency, index of the keypress in its array, and key actually pressed"""
         try:
-            key = self.msg_queue.get(block=True)
+            key, msg = self.msg_queue.get(block=True)
         except Empty:
             print("empty")
             return -1
         try:
             index = self.key_scale.index(key)
-            return self.freq_scale[index]
+            return (key, self.freq_scale[index], msg)
         except ValueError:
             raise ValueError("freq doesnt exist")
