@@ -1,4 +1,5 @@
 """Sinewave implementation"""
+from pyo.lib.controls import Adsr
 from pyo.lib.generators import Sine
 
 # Trying to run this script by itself will throw an ImportError
@@ -15,7 +16,7 @@ class SineWave(Synth):
         Amp is amplitude (loudness)"""
         self._amp = amp
         self._freq = freq
-        self._osc = Sine(freq=freq, mul=self._amp)
+        self._osc = Sine(freq=freq, mul=Adsr())
         self._distortion = 1
         self._reverb = 0
 

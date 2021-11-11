@@ -1,13 +1,14 @@
 """GUI class for wx Frame"""
 import sys
+import threading
 from pynput.keyboard import Key
+from pyo.lib.controls import Adsr
 import wx
+from wx.core import EVT_SCROLL_CHANGED, EVT_SLIDER, SL_INVERSE, SL_VERTICAL
 from wx.lib.agw.knobctrl import KnobCtrl, EVT_KC_ANGLE_CHANGED
 from wx import EVT_CHOICE, EVT_BUTTON, TE_PROCESS_ENTER
 from pyo.lib.generators import FM, Sine
 from pyo.lib.effects import Disto, Freeverb
-from pyo.lib.wxgui import PyoGuiScope
-from pyo.lib.analysis import Scope
 from .waveforms.sinewave import SineWave
 from .waveforms.trianglewave import TriangleWave
 from .waveforms.squarewave import SquareWave
@@ -54,6 +55,8 @@ class PycrotonalFrame(wx.Frame):
         self.apply_fm = False
 
         self.synth = SineWave(440, 0.3)
+        # self.adsr = Adsr()
+        # self.synth.amp = self.adsr
         self.fm_ratio = self.fm_freq / 440
         self.fm_index = 1
         if self.apply_fm:
@@ -81,6 +84,11 @@ class PycrotonalFrame(wx.Frame):
         self.Center()
         self.Show()
 
+        # Start a new thread to get frequencies
+        # Has daemon=True so it also shuts down when main loop stops
+        thrd_freq = threading.Thread(target=self.get_frequencies, daemon=True)
+        thrd_freq.start()
+        
     def on_exit(self, event):
         """Stops the audio server on exit"""
         self.server.stop()
@@ -112,6 +120,13 @@ class PycrotonalFrame(wx.Frame):
         self.btn_toggle_synth = wx.Button(panel, label="Start Synth")
         self.btn_toggle_synth.Bind(EVT_BUTTON, self.handle_toggle_synth)
         main_box.Add(self.btn_toggle_synth, 0, wx.ALIGN_CENTER_HORIZONTAL, 2)
+        
+        self.lbl_frequency = wx.StaticText(panel, label="Frequency:", style=wx.ALIGN_CENTER)
+        main_box.Add(self.lbl_frequency, 0, wx.ALIGN_CENTER_HORIZONTAL, 20)
+        frequency_font = wx.Font(
+            15, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD
+        )
+        title.SetFont(frequency_font)
 
         # Waveform oscilloscope
         # self.osc_scope = PyoGuiScope(panel)
@@ -163,6 +178,36 @@ class PycrotonalFrame(wx.Frame):
 
         params_box.AddStretchSpacer(1)
 
+        # ADSR
+        adsr_param_box = wx.BoxSizer(wx.HORIZONTAL)
+        # Sliders will look linear but handlers will map onto exponential values
+        lbl_attack = wx.StaticText(panel, label="Attack", style=wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        adsr_param_box.Add(lbl_attack, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.attack_slider = wx.Slider(panel, value=0, style=SL_VERTICAL | SL_INVERSE)
+        adsr_param_box.Add(self.attack_slider, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.Bind(EVT_SLIDER, self.handle_attack_change, self.attack_slider)
+        
+        lbl_decay = wx.StaticText(panel, label="Decay", style=wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        adsr_param_box.Add(lbl_decay, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.decay_slider = wx.Slider(panel, value=0, style=SL_VERTICAL | SL_INVERSE)
+        adsr_param_box.Add(self.decay_slider, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.Bind(EVT_SLIDER, self.handle_decay_change, self.decay_slider)
+        
+        lbl_sustain = wx.StaticText(panel, label="Sustain", style=wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        adsr_param_box.Add(lbl_sustain, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.sustain_slider = wx.Slider(panel, value=0, style=SL_VERTICAL | SL_INVERSE)
+        adsr_param_box.Add(self.sustain_slider, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.Bind(EVT_SLIDER, self.handle_sustain_change, self.sustain_slider)
+        
+        lbl_release = wx.StaticText(panel, label="Release", style=wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        adsr_param_box.Add(lbl_release, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.release_slider = wx.Slider(panel, value=0, style=SL_VERTICAL | SL_INVERSE)
+        adsr_param_box.Add(self.release_slider, 0, wx.SHAPED | wx.RIGHT, 3)
+        self.Bind(EVT_SLIDER, self.handle_release_change, self.release_slider)
+        
+        params_box.Add(adsr_param_box, 0, wx.TOP | wx.EXPAND, 10)
+        params_box.AddStretchSpacer(1)
+        
         # Reverb and Distortion Params
         # Reverb
         rev_dist_param_box = wx.BoxSizer(wx.VERTICAL)
@@ -238,7 +283,7 @@ class PycrotonalFrame(wx.Frame):
         self.lbl_dist.Refresh()
 
     def handle_toggle_synth(self, event):
-        """Toggle whether the synth is playing,"""
+        """Toggle whether the synth is playing, also reconstructs microtonal synth array"""
         if self.is_playing:
             print("no")
             self.stop_synth()
@@ -283,12 +328,40 @@ class PycrotonalFrame(wx.Frame):
                 self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
             )
 
+    def handle_attack_change(self, event):
+        print("attack", self.attack_slider.GetValue())
+    
+    def handle_decay_change(self, event):
+        print("decay", self.decay_slider.GetValue())
+    
+    def handle_sustain_change(self, event):
+        print("sustain", self.sustain_slider.GetValue())
+        
+    def handle_release_change(self, event):
+        print("release", self.release_slider.GetValue())
+    
     def play_synth(self):
         """Starts the Synth"""
-        # self.synth.get_synth().out()
+        self.synth.get_synth().play()
         self.final_synth.out()
 
     def stop_synth(self):
         """Stops the Synth"""
-        # self.synth.get_synth().stop()
+        self.synth.get_synth().stop()
         self.final_synth.stop()
+
+    def get_frequencies(self):
+        while True:
+            # TODO: Need to check if this actually works or need to call a "set freq()" function
+            # Implement an array where we can construct the synths dynamically
+            # Maybe just have them running at 0 amp
+            # Also need wxpython input for edo
+            # Also need wxpython showing frequency played
+            try:
+                freq = self.keyboard.get_freq()
+                print(freq)
+                self.lbl_frequency.SetLabel("Frequency: " + str(freq))
+                self.synth.freq = freq
+            except ValueError as e:
+                print(e)
+    

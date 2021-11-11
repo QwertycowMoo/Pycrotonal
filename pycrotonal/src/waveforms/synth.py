@@ -82,8 +82,10 @@ class Synth(abc.ABC):
     @amp.setter
     def amp(self, value):
         """amp setter, limits at 1"""
-        if value > 1:
-            raise ValueError("Amplitude cannot be larger than 1!")
+        if not isinstance(value, PyoObject):
+            if value > 1:
+                raise ValueError("Amplitude cannot be larger than 1!")
+        print(value)
         self._amp = value
         self._osc.setMul(self._amp)
 
