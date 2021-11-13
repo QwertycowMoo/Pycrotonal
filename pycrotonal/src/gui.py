@@ -4,12 +4,13 @@ import threading
 from pynput import keyboard
 from pynput.keyboard import Key
 from pyo.lib.controls import Adsr
+from pyo.lib._core import Mix
+from pyo.lib.generators import FM, Sine
+from pyo.lib.effects import Disto, Freeverb
 import wx
 from wx.core import EVT_SCROLL_CHANGED, EVT_SLIDER, SL_INVERSE, SL_VERTICAL
 from wx.lib.agw.knobctrl import KnobCtrl, EVT_KC_ANGLE_CHANGED
 from wx import EVT_CHOICE, EVT_BUTTON, TE_PROCESS_ENTER
-from pyo.lib.generators import FM, Sine
-from pyo.lib.effects import Disto, Freeverb
 from musx import rescale
 from .waveforms.sinewave import SineWave
 from .waveforms.trianglewave import TriangleWave
@@ -301,19 +302,21 @@ class PycrotonalFrame(wx.Frame):
     def handle_waveform_change(self, event):
         """Handles the waveform selection change and creates new synth objects"""
         if event.GetSelection() == SINE_INDEX:
-            self.synth = SineWave(440, self.adsr)
+            self.synths = {key: SineWave(freq, self.adsr_arr[i]) for i, (key, freq) in enumerate(self.keyboard.get_scale())}
         elif event.GetSelection() == SQUARE_INDEX:
-            self.synth = SquareWave(440, self.adsr)
+            self.synths = {key: SquareWave(freq, self.adsr_arr[i]) for i, (key, freq) in enumerate(self.keyboard.get_scale())}
         elif event.GetSelection() == TRIANGLE_INDEX:
-            self.synth = TriangleWave(440, self.adsr)
+            self.synths = {key: TriangleWave(freq, self.adsr_arr[i]) for i, (key, freq) in enumerate(self.keyboard.get_scale())}
         elif event.GetSelection() == SAW_INDEX:
-            self.synth = SawtoothWave(440, self.adsr)
+            self.synths = {key: SawtoothWave(freq, self.adsr_arr[i]) for i, (key, freq) in enumerate(self.keyboard.get_scale())}
 
+        # Mix all together
+        mix = Mix(self.synths.values(), 2)
         self.dist_effect = Disto(
-            self.synth.get_synth(), drive=self.distortion, slope=0.8
+            mix, drive=self.distortion, slope=0.8
         )
         self.final_synth = Freeverb(
-            self.synth.get_synth(), size=0.8, damp=0.7, bal=self.reverb
+            mix, size=0.8, damp=0.7, bal=self.reverb
             )
     def handle_attack_change(self, event):
         
