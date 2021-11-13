@@ -76,7 +76,7 @@ class Synth(abc.ABC):
         try:
             self._osc.setFreq(self._freq)
         except AttributeError:
-            # Oscillator has not been initialized before trying to set the multipler. 
+            # Oscillator has not been initialized before trying to set the multipler.
             # This is expected behavior when initializing a synth
             pass
 
@@ -95,7 +95,7 @@ class Synth(abc.ABC):
         try:
             self._osc.setMul(self._adsr)
         except AttributeError:
-            # Oscillator has not been initialized before trying to set the multipler. 
+            # Oscillator has not been initialized before trying to set the multipler.
             # This is expected behavior when initializing a synth
             pass
 
@@ -106,13 +106,12 @@ class Synth(abc.ABC):
 
     def play(self):
         self._osc.out()
-        print(self._adsr.__dir__)
         self._adsr.play()
-        
+
     def stop(self):
         self._adsr.stop()
         # self._osc.stop()
-        
+
     @abc.abstractmethod
     def get_harmonics(self):
         """Gets the harmonic spectrum of the synth for the FM synthesizer

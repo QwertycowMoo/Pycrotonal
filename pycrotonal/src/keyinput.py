@@ -197,7 +197,7 @@ SCALE_60_EDO = [
     KeyCode.from_char("'"),
     Key.shift_r,  # right shift
     Key.f12,
-    KeyCode.from_char("="), # +
+    KeyCode.from_char("="),  # +
     KeyCode.from_char("]"),
     KeyCode.from_char("\\"),  # \
     Key.backspace,  # backspace
@@ -222,14 +222,9 @@ class Keyboard:
     def on_press(self, key):
         """on press handler"""
         self.msg_queue.put((key, "start"))
-        # try:
-        #     print("alphanumeric key {0} pressed".format(key))
-        # except AttributeError:
-        #     print("special key {0} pressed".format(key))
 
     def on_release(self, key):
         """on release handler"""
-        # print("{0} released".format(key))
         self.msg_queue.put((key, "stop"))
         if key == keyboard.Key.esc:
             # Stop listener
@@ -254,11 +249,11 @@ class Keyboard:
         if edo <= 60:
             return SCALE_60_EDO[0:edo]
         raise ValueError("This is not a valid edo")
-        
+
     def get_scale(self):
         """Return a list of tuples of keyboard key and frequency"""
         return zip(self.key_scale, self.freq_scale)
-    
+
     def get_keypress(self):
         """Allows GUI to get frequency associated with keypress in a (kind of) async way
         returns the frequency, index of the keypress in its array, and key actually pressed"""
