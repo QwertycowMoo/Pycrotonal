@@ -3,6 +3,7 @@ import unittest
 import wx
 from wx.lib.agw.knobctrl import KnobCtrlEvent, EVT_KC_ANGLE_CHANGED
 from src.gui import PycrotonalFrame
+from wx import UIActionSimulator
 
 
 class TestGUI(unittest.TestCase):
@@ -18,6 +19,7 @@ class TestGUI(unittest.TestCase):
             size=wx.Size(700, 500),
             style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
         )
+        cls.keyinput = UIActionSimulator()
 
     @classmethod
     def tearDownClass(cls):
@@ -99,7 +101,6 @@ class TestGUI(unittest.TestCase):
         self.assertEqual(
             self.frame.lbl_dist.GetLabelText(), "Distortion: 50", "textbox also changed"
         )
-
-
+        
 if __name__ == "__main__":
     unittest.main()

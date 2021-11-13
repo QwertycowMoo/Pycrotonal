@@ -73,7 +73,12 @@ class Synth(abc.ABC):
         if value < 0 or value > 22000:
             raise ValueError("This is outside the range of hearing!")
         self._freq = value
-        self._osc.setFreq(self._freq)
+        try:
+            self._osc.setFreq(self._freq)
+        except AttributeError:
+            # Oscillator has not been initialized before trying to set the multipler. 
+            # This is expected behavior when initializing a synth
+            pass
 
     @property
     def adsr(self):
@@ -87,7 +92,12 @@ class Synth(abc.ABC):
         if not isinstance(value, PyoObject):
             raise ValueError("Amplitude must be a ADSR PyoObject")
         self._adsr = value
-        self._osc.setMul(self._adsr)
+        try:
+            self._osc.setMul(self._adsr)
+        except AttributeError:
+            # Oscillator has not been initialized before trying to set the multipler. 
+            # This is expected behavior when initializing a synth
+            pass
 
     def get_synth(self):
         """Gets the pyo synth object, will need to be implemented

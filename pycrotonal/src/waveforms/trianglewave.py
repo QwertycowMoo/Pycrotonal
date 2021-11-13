@@ -10,8 +10,8 @@ class TriangleWave(Synth):
         """Constructor, uses RCOsc with 0 sharpness
         Freq is fundemental frequency
         adsr is Adsr object to control attack decay sustain release"""
-        self._freq = freq
-        self._adsr = adsr
+        self.freq = freq
+        self.adsr = adsr
         self._wavetable = TriangleTable(order=20)
         self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._adsr)
 

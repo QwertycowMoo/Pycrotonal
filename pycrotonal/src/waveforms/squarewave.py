@@ -11,8 +11,8 @@ class SquareWave(Synth):
         """Constructor, uses Squaretable to avoid aliasing
         Freq is fundemental frequency
         adsr is Adsr object to control attack decay sustain release"""
-        self._freq = freq
-        self._adsr = adsr
+        self.freq = freq
+        self.adsr = adsr
         self._wavetable = SquareTable(order=25)
         # Sharp determines shape of waveform, 0 = triangle
         self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._adsr)

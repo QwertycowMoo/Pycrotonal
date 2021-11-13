@@ -11,8 +11,8 @@ class SawtoothWave(Synth):
         Freq is fundemental frequency
         adsr is Adsr object to control attack decay sustain release"""
         self.order = 25
-        self._freq = freq
-        self._adsr = adsr
+        self.freq = freq
+        self.adsr = adsr
         self._wavetable = SawTable(order=self.order)
         self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._adsr)
 

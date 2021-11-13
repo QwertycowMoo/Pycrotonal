@@ -14,9 +14,9 @@ class SineWave(Synth):
         """Constructor, uses the base harmonic table with 1 harmonic
         Freq is fundemental frequency
         adsr is Adsr object to control attack decay sustain release"""
-        self._adsr = adsr
-        self._freq = freq
-        self._osc = Sine(freq=freq, mul=self._adsr)
+        self.adsr = adsr
+        self.freq = freq
+        self._osc = Sine(freq=freq, mul=self.adsr)
         self._distortion = 1
         self._reverb = 0
 

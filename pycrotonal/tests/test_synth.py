@@ -1,6 +1,8 @@
 """Test for the synths"""
 import unittest
 import sys
+
+from pyo.lib.controls import Adsr
 from src.waveforms.sinewave import SineWave
 from src.waveforms.squarewave import SquareWave
 from src.waveforms.trianglewave import TriangleWave
@@ -14,14 +16,15 @@ class TestSynths(unittest.TestCase):
 
     def test_sine_harmonics(self):
         """Test the sine harmonics, should just be 1"""
-
-        sine = SineWave(100, 0.5)
+        adsr = Adsr()
+        sine = SineWave(100, adsr)
         self.assertEqual(sine.get_harmonics(), 100)
 
     def test_square_harmonics(self):
         """Test the square wave harmonics, should be odd harmonics up until the nyquist limit
         w/amplitude of 1/n"""
-        square = SquareWave(1000, 0.5)
+        adsr = Adsr()
+        square = SquareWave(1000, adsr)
         self.assertEqual(square.get_harmonics(), (
             [
                 1000,
@@ -56,7 +59,8 @@ class TestSynths(unittest.TestCase):
     def test_triangle_harmonics(self):
         """Test the square wave harmonics, should be odd harmonics up until the nyquist limit
         w/amplitude of 1/n^2"""
-        triangle = TriangleWave(1000, 0.5)
+        adsr = Adsr()
+        triangle = TriangleWave(1000, adsr)
         self.assertEqual(triangle.get_harmonics(), (
             [1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000, 17000, 19000],
             [
@@ -76,7 +80,8 @@ class TestSynths(unittest.TestCase):
     def test_sawtooth_harmonics(self):
         """Test the square wave harmonics, should be all harmonics up until the nyquist limit
         w/amplitude of 1/n"""
-        saw = SawtoothWave(1000, 0.5)
+        adsr = Adsr()
+        saw = SawtoothWave(1000, adsr)
         self.assertEqual(saw.get_harmonics(), (
             [
                 1000,
@@ -132,6 +137,23 @@ class TestSynths(unittest.TestCase):
             ],
         ))
 
-
+    def test_adsr(self):
+        adsr = Adsr()
+        sine = SineWave(100, adsr)
+        self.assertNotEqual(sine.adsr, None, "Test that adsr is accepted")
+    
+    def test_invalid_adsr(self):
+        adsr = 5.0
+        self.assertRaises(ValueError, SineWave, 100, adsr)
+        
+    def test_set_outside_freq(self):
+        adsr = Adsr()
+        sine = SineWave(440, adsr)
+        with self.assertRaises(ValueError):
+            sine.freq = 400000
+        
+        with self.assertRaises(ValueError):
+            sine.freq = -100
+        
 if __name__ == "__main__":
     unittest.main()
