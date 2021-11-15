@@ -131,13 +131,26 @@ class PycrotonalFrame(wx.Frame):
         main_box.Add(params_box, 0, wx.ALL | wx.EXPAND, 10)
 
         self.lbl_frequency = wx.StaticText(
-            panel, label="Frequency:", style=wx.ALIGN_CENTER
+            panel, label="Key: Frequency:", style=wx.ALIGN_CENTER
         )
         main_box.Add(self.lbl_frequency, 0, wx.ALIGN_CENTER_HORIZONTAL, 20)
         frequency_font = wx.Font(
             15, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD
         )
         title.SetFont(frequency_font)
+        
+        lbl_keymap_title = wx.StaticText(
+            panel, label="Key Mapping:", style=wx.ALIGN_CENTER
+        )
+        main_box.Add(lbl_keymap_title, 0, wx.ALIGN_CENTER_HORIZONTAL, 20)
+
+        mapping_string = ""
+        for key, freq in self.keyboard.get_scale():
+            mapping_string += "Key: " + str(key) + " Freq: " + str(freq) + "\n"
+        self.lbl_keymapping = wx.StaticText(
+            panel, label=mapping_string, style=wx.ALIGN_CENTER
+        )
+        main_box.Add(self.lbl_keymapping, 0, wx.ALIGN_CENTER_HORIZONTAL, 20)
 
         # Waveform oscilloscope
         # self.osc_scope = PyoGuiScope(panel)
@@ -262,6 +275,7 @@ class PycrotonalFrame(wx.Frame):
         self.fm_index = value
         self.lbl_fm_index.SetLabel("FM Index: " + str(value))
         self.lbl_fm_index.Refresh()
+        self.SetFocus()
 
     def handle_fm_freq_knob(self, event):
         """Handles the fm_freq knob"""
@@ -269,6 +283,7 @@ class PycrotonalFrame(wx.Frame):
         self.fm_freq = value
         self.txt_fm_freq.SetValue(str(value))
         self.txt_fm_freq.Refresh()
+        self.SetFocus()
 
     def handle_fm_freq_input(self, event):
         """Handles the fm_freq text input"""
@@ -281,6 +296,7 @@ class PycrotonalFrame(wx.Frame):
                 self.ctrl_fm_freq.Refresh()
         except ValueError:
             print("This is not an integer")
+        self.SetFocus()
 
     def handle_reverb_knob(self, event):
         """Handles the reverb knob"""
@@ -290,6 +306,7 @@ class PycrotonalFrame(wx.Frame):
         self.final_output.setBal(self.reverb)
         self.lbl_reverb.SetLabel("Reverb: " + str(value))
         self.lbl_reverb.Refresh()
+        self.SetFocus()
 
     def handle_distortion_knob(self, event):
         """Handles the distortion knob"""
@@ -300,6 +317,7 @@ class PycrotonalFrame(wx.Frame):
         self.final_output.setInput(self.dist_effect)
         self.lbl_dist.SetLabel("Distortion: " + str(value))
         self.lbl_dist.Refresh()
+        self.SetFocus()
 
     def handle_toggle_synth(self, event):
         """Toggle whether the synth is playing, also reconstructs microtonal synth array"""
@@ -340,6 +358,7 @@ class PycrotonalFrame(wx.Frame):
         self.final_output = Freeverb(self.mix, size=0.8, damp=0.7, bal=self.reverb)
         # Have out send so effects are applied again
         self.final_output.out()
+        self.SetFocus()
 
     def handle_attack_change(self, event):
 
@@ -347,24 +366,28 @@ class PycrotonalFrame(wx.Frame):
         attack = rescale(attack, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
             adsr.setAttack(attack)
+        self.SetFocus()
 
     def handle_decay_change(self, event):
         decay = self.decay_slider.GetValue()
         decay = rescale(decay, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
             adsr.setDecay(decay)
+        self.SetFocus()
 
     def handle_sustain_change(self, event):
         sustain = self.sustain_slider.GetValue()
         sustain = rescale(sustain, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
             adsr.setSustain(sustain)
+        self.SetFocus()
 
     def handle_release_change(self, event):
         release = self.release_slider.GetValue()
         release = rescale(release, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
             adsr.setRelease(release)
+        self.SetFocus()
 
     def get_keypress(self):
         while True:
