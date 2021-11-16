@@ -237,8 +237,9 @@ class Keyboard:
         self.listener.start()
 
     def stop_listening(self):
+        """Stop listening to keyboard"""
         self.listener.stop()
-        
+
     def find_key_scale(self, edo):
         """returns the keys that will be associated with a frequency"""
         if edo < 1:
@@ -270,5 +271,5 @@ class Keyboard:
         try:
             index = self.key_scale.index(key)
             return (key, self.freq_scale[index], msg)
-        except ValueError:
-            raise ValueError("freq doesnt exist")
+        except ValueError as non_exist_freq:
+            raise ValueError("freq doesnt exist") from non_exist_freq

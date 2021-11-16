@@ -1,17 +1,21 @@
 """GUI class for wx Frame"""
 import sys
 import threading
-from pynput import keyboard
-from pynput.keyboard import Key
 from pyo.lib.controls import Adsr
 from pyo.lib._core import Mix
 from pyo.lib.dynamics import Compress
 from pyo.lib.generators import FM, Sine
 from pyo.lib.effects import Disto, Freeverb
 import wx
-from wx.core import EVT_SCROLL_CHANGED, EVT_SLIDER, LB_ALIGN_MASK, SL_INVERSE, SL_VERTICAL
 from wx.lib.agw.knobctrl import KnobCtrl, EVT_KC_ANGLE_CHANGED
-from wx import EVT_CHOICE, EVT_BUTTON, TE_PROCESS_ENTER
+from wx import (
+    EVT_CHOICE,
+    EVT_BUTTON,
+    TE_PROCESS_ENTER,
+    EVT_SLIDER,
+    SL_INVERSE,
+    SL_VERTICAL,
+)
 from musx import rescale
 from .waveforms.sinewave import SineWave
 from .waveforms.trianglewave import TriangleWave
@@ -30,6 +34,7 @@ SAW_INDEX = 3
 FM_MAX_FREQ = 9000
 STARTING_EDO = 60
 
+
 class PycrotonalFrame(wx.Frame):
     """Main Frame for Pycrotonal"""
 
@@ -47,9 +52,10 @@ class PycrotonalFrame(wx.Frame):
         super().__init__(*args, **kw)
         self.server = AudioServer()
         # How do we have polyphony:
-        # Have an array of Synth objects that are always running in the background. When a key is pressed,
-        # An envelope is applied onto the synth that corresponds to the ADSR parameters
-        # Each ADSR and Synth is distinct so we can have as many notes as there are keys to press
+        # Have an array of Synth objects that are always running in the background.
+        # When a key is pressed, An envelope is applied onto the synth that corresponds
+        # to the ADSR parameters.Each ADSR and Synth is distinct so we can have as many
+        # notes as there are keys to press
 
         # Distortion has set params, can only control drive amount and not clip function
         self.distortion = 0
@@ -63,7 +69,7 @@ class PycrotonalFrame(wx.Frame):
         self.is_playing = False
         self.server.play()
         self.final_output.out()
-        
+
         self.SetFocus()
         self.Bind(wx.EVT_CLOSE, self.on_exit)
         self.Center()
@@ -100,10 +106,10 @@ class PycrotonalFrame(wx.Frame):
         params_box = self.init_params_sizer(panel)
         main_box.Add(params_box, 0, wx.ALL | wx.EXPAND, 10)
 
-        #EDO and KEYMAP
+        # EDO and KEYMAP
         keymap_box = self.init_keymap_sizer(panel)
         main_box.Add(keymap_box, 0, wx.ALL | wx.EXPAND, 10)
-        
+
         # Waveform oscilloscope
         # self.osc_scope = PyoGuiScope(panel)
         # main_box.Add(self.osc_scope, 0, wx.ALIGN_CENTER_HORIZONTAL, 2)
@@ -231,8 +237,8 @@ class PycrotonalFrame(wx.Frame):
         edo_select.SetSelection(STARTING_EDO - 1)
         edo_box.Add(edo_select, 0, 0, 10)
         self.Bind(EVT_CHOICE, self.handle_edo_change, edo_select)
-        
-        keymap_sizer.Add(edo_box,  0, wx.TOP | wx.ALIGN_CENTER_HORIZONTAL, 10)
+
+        keymap_sizer.Add(edo_box, 0, wx.TOP | wx.ALIGN_CENTER_HORIZONTAL, 10)
         self.lbl_frequency = wx.StaticText(
             panel, label="Key: Frequency:", style=wx.ALIGN_CENTER
         )
@@ -241,25 +247,17 @@ class PycrotonalFrame(wx.Frame):
             11, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD
         )
         self.lbl_frequency.SetFont(frequency_font)
-        
+
         lbl_keymap_title = wx.StaticText(
             panel, label="Key Mapping:", style=wx.ALIGN_CENTER
         )
         keymap_sizer.Add(lbl_keymap_title, 0, wx.ALIGN_CENTER_HORIZONTAL, 20)
 
         self.mapping_box = wx.BoxSizer(wx.HORIZONTAL)
-        self.lbl_keymapping_1 = wx.StaticText(
-            panel, label="", style=wx.ALIGN_CENTER
-        )
-        self.lbl_keymapping_2 = wx.StaticText(
-            panel, label="", style=wx.ALIGN_CENTER
-        )
-        self.lbl_keymapping_3 = wx.StaticText(
-            panel, label="", style=wx.ALIGN_CENTER
-        )
-        self.lbl_keymapping_4 = wx.StaticText(
-            panel, label="", style=wx.ALIGN_CENTER
-        )
+        self.lbl_keymapping_1 = wx.StaticText(panel, label="", style=wx.ALIGN_CENTER)
+        self.lbl_keymapping_2 = wx.StaticText(panel, label="", style=wx.ALIGN_CENTER)
+        self.lbl_keymapping_3 = wx.StaticText(panel, label="", style=wx.ALIGN_CENTER)
+        self.lbl_keymapping_4 = wx.StaticText(panel, label="", style=wx.ALIGN_CENTER)
         self.mapping_box.Add(self.lbl_keymapping_1, 0, 0, 5)
         self.mapping_box.Add(self.lbl_keymapping_2, 0, 0, 5)
         self.mapping_box.Add(self.lbl_keymapping_3, 0, 0, 5)
@@ -267,7 +265,7 @@ class PycrotonalFrame(wx.Frame):
         keymap_sizer.Add(self.mapping_box, 0, wx.ALIGN_CENTER_HORIZONTAL, 10)
 
         return keymap_sizer
-    
+
     def handle_fm_index_knob(self, event):
         """Handles the fm_index knob"""
         value = event.GetValue()
@@ -323,7 +321,7 @@ class PycrotonalFrame(wx.Frame):
         # Stop previous synths to remove from processing loop
         for synth in self.synths.values():
             synth.get_synth().stop()
-            
+
         if event.GetSelection() == SINE_INDEX:
             self.synths = {
                 key: SineWave(freq, self.adsr_arr[i])
@@ -349,19 +347,24 @@ class PycrotonalFrame(wx.Frame):
         raw_synths = [synth.get_synth() for synth in self.synths.values()]
         self.mix = Mix(raw_synths, 2)
         self.dist_effect = Disto(self.mix, drive=self.distortion, slope=0.8)
-        self.reverb_effect = Freeverb(self.dist_effect, size=0.8, damp=0.7, bal=self.reverb)
+        self.reverb_effect = Freeverb(
+            self.dist_effect, size=0.8, damp=0.7, bal=self.reverb
+        )
         self.final_output = Compress(self.reverb_effect)
         # Have out send so effects are applied again
         self.final_output.out()
-        
+
         self.SetFocus()
 
     def handle_edo_change(self, event):
+        """Handles the edo selection change"""
         edo = event.GetSelection() + 1
         self.change_synth_edo(edo)
         self.SetFocus()
-        
+
     def change_synth_edo(self, edo):
+        """Initializes or changes the synth edo. Creates all synths and ADSR envelopes
+        Stops all previous synths to save computation cycles"""
         try:
             self.keyboard.stop_listening()
             self.wave_select.SetSelection(0)
@@ -372,10 +375,9 @@ class PycrotonalFrame(wx.Frame):
             pass
         self.keyboard = Keyboard(440, edo)
         self.keyboard.start_listening()
-         # Have array of independent adsr so that each note has its own envelope
+        # Have array of independent adsr so that each note has its own envelope
         self.adsr_arr = [
-            Adsr(attack=0.01, decay=0.01, release=0.01, mul=0.2)
-            for _ in range(edo)
+            Adsr(attack=0.01, decay=0.01, release=0.01, mul=0.2) for _ in range(edo)
         ]
         # Create all synths and so when the key is pressed, it starts the synth associated with the key
         self.synths = {
@@ -396,27 +398,30 @@ class PycrotonalFrame(wx.Frame):
             )
         else:
             self.dist_effect = Disto(self.mix, drive=self.distortion, slope=0.8)
-            self.reverb_effect = Freeverb(self.dist_effect, size=0.8, damp=0.7, bal=self.reverb)
+            self.reverb_effect = Freeverb(
+                self.dist_effect, size=0.8, damp=0.7, bal=self.reverb
+            )
             self.final_output = Compress(self.reverb_effect, ratio=4)
         thrd_keypress = threading.Thread(target=self.get_keypress, daemon=True)
         thrd_keypress.start()
-        
+
         self.update_keymapping_label()
-        
+
     def update_keymapping_label(self):
+        """Updates the keymapping labels at the bottom of the GUI"""
         mapping = []
         for key, freq in self.keyboard.get_scale():
             mapping.append("Key: " + str(key) + " Freq: " + str(freq) + "\n")
         num_elem = int(len(mapping) / 4)
-        
-        # Sets an equal number of elements to each keymapping label
-        self.lbl_keymapping_1.SetLabel(" ".join(mapping[0 : num_elem]))
-        self.lbl_keymapping_2.SetLabel(" ".join(mapping[num_elem:num_elem * 2]))
-        self.lbl_keymapping_3.SetLabel(" ".join(mapping[num_elem * 2:num_elem * 3]))
-        self.lbl_keymapping_4.SetLabel(" ".join(mapping[num_elem * 3:]))
-        
-    def handle_attack_change(self, event):
 
+        # Sets an equal number of elements to each keymapping label
+        self.lbl_keymapping_1.SetLabel(" ".join(mapping[0:num_elem]))
+        self.lbl_keymapping_2.SetLabel(" ".join(mapping[num_elem : num_elem * 2]))
+        self.lbl_keymapping_3.SetLabel(" ".join(mapping[num_elem * 2 : num_elem * 3]))
+        self.lbl_keymapping_4.SetLabel(" ".join(mapping[num_elem * 3 :]))
+
+    def handle_attack_change(self, event):
+        """Handles attack slider of ADSR"""
         attack = self.attack_slider.GetValue()
         attack = rescale(attack, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
@@ -424,6 +429,7 @@ class PycrotonalFrame(wx.Frame):
         self.SetFocus()
 
     def handle_decay_change(self, event):
+        """Handles decay slider of ADSR"""
         decay = self.decay_slider.GetValue()
         decay = rescale(decay, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
@@ -431,6 +437,7 @@ class PycrotonalFrame(wx.Frame):
         self.SetFocus()
 
     def handle_sustain_change(self, event):
+        """Handles sustain slider of ADSR"""
         sustain = self.sustain_slider.GetValue()
         sustain = rescale(sustain, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
@@ -438,6 +445,7 @@ class PycrotonalFrame(wx.Frame):
         self.SetFocus()
 
     def handle_release_change(self, event):
+        """Handles release slider of ADSR"""
         release = self.release_slider.GetValue()
         release = rescale(release, 0, 100, 0, 10, mode="exp")
         for adsr in self.adsr_arr:
@@ -445,14 +453,17 @@ class PycrotonalFrame(wx.Frame):
         self.SetFocus()
 
     def get_keypress(self):
+        """Runs in a thread to get the keypresses and play the corresponding synth"""
         while True:
             # Also need wxpython input for edo
             try:
                 key, freq, msg = self.keyboard.get_keypress()
                 if msg == "start":
-                    self.lbl_frequency.SetLabel("Key: " + str(key) + "Frequency: " + str(freq))
+                    self.lbl_frequency.SetLabel(
+                        "Key: " + str(key) + "Frequency: " + str(freq)
+                    )
                     self.synths[key].play()
                 elif msg == "stop":
                     self.synths[key].stop()
-            except ValueError as e:
-                print(e)
+            except ValueError as error:
+                print(error)

@@ -82,16 +82,18 @@ class TestScales(unittest.TestCase):
             246.94156,
             261.62546,
         ]
-        for i in range(len(scale)):
-            self.assertAlmostEqual(scale[i], correct_12edo[i], 3)
+        for i, note in enumerate(scale):
+            self.assertAlmostEqual(note, correct_12edo[i], 3)
 
     def test_create_3_edo_scale_2_octave(self):
+        """Try to create a 3 edo scale with 2 octaves"""
         scale = find_scale(440, 3, 2)
         self.assertEqual(
             scale, [440, 554.3653, 698.4565, 880.0, 1108.7305, 1396.9129, 1760.0]
         )
 
     def test_create_invalid_root(self):
+        """Try to create a scale with an invalid root"""
         self.assertRaises(ValueError, find_scale, -1, 12, 1)
 
 

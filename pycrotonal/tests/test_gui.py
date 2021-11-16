@@ -2,8 +2,8 @@
 import unittest
 import wx
 from wx.lib.agw.knobctrl import KnobCtrlEvent, EVT_KC_ANGLE_CHANGED
-from src.gui import PycrotonalFrame
 from wx import UIActionSimulator
+from src.gui import PycrotonalFrame
 
 
 class TestGUI(unittest.TestCase):

@@ -1,6 +1,5 @@
 """Test for the synths"""
 import unittest
-import sys
 
 from pyo.lib.controls import Adsr
 from src.waveforms.sinewave import SineWave
@@ -11,7 +10,10 @@ from src.audioserver import AudioServer
 
 
 class TestSynths(unittest.TestCase):
+    """Test cases for the Synth objects"""
+
     def setUp(self):
+        """Setup an audioserver"""
         self.audioserver = AudioServer()
 
     def test_sine_harmonics(self):
@@ -147,15 +149,18 @@ class TestSynths(unittest.TestCase):
         )
 
     def test_adsr(self):
+        """Tests applying an ADSR on the synth"""
         adsr = Adsr()
         sine = SineWave(100, adsr)
         self.assertNotEqual(sine.adsr, None, "Test that adsr is accepted")
 
     def test_invalid_adsr(self):
+        """Tests applying an invalid ADSR"""
         adsr = 5.0
         self.assertRaises(ValueError, SineWave, 100, adsr)
 
     def test_set_outside_freq(self):
+        """Test setting a frequency outside the range"""
         adsr = Adsr()
         sine = SineWave(440, adsr)
         with self.assertRaises(ValueError):

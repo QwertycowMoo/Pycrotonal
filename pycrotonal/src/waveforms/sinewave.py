@@ -1,5 +1,4 @@
 """Sinewave implementation"""
-from pyo.lib.controls import Adsr
 from pyo.lib.generators import Sine
 
 # Trying to run this script by itself will throw an ImportError

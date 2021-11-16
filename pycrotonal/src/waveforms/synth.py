@@ -3,7 +3,6 @@ This module will apply the sound effects onto the original waveform"""
 import abc
 from pyo import PyoTableObject
 from pyo import PyoObject
-import time
 
 # pyo must start the server before anything else
 SAMPLE_RATE = 48000
@@ -105,12 +104,13 @@ class Synth(abc.ABC):
         return self._osc
 
     def play(self):
+        """Play the synth"""
         self._osc.out()
         self._adsr.play()
 
     def stop(self):
+        """Stop the synth"""
         self._adsr.stop()
-        # self._osc.stop()
 
     @abc.abstractmethod
     def get_harmonics(self):
