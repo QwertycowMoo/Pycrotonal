@@ -221,10 +221,12 @@ class Keyboard:
 
     def on_press(self, key):
         """on press handler"""
+        print("press")
         self.msg_queue.put((key, "start"))
 
     def on_release(self, key):
         """on release handler"""
+        print("release")
         self.msg_queue.put((key, "stop"))
         if key == keyboard.Key.esc:
             # Stop listener
@@ -234,6 +236,9 @@ class Keyboard:
         """Listen to keyboard"""
         self.listener.start()
 
+    def stop_listening(self):
+        self.listener.stop()
+        
     def find_key_scale(self, edo):
         """returns the keys that will be associated with a frequency"""
         if edo < 1:

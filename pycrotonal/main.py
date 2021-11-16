@@ -12,7 +12,7 @@ if __name__ == "__main__":
     frame = PycrotonalFrame(
         None,
         title="Pycrotonal",
-        size=wx.Size(700, 700),
+        size=wx.Size(700, 800),
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
     )
     app.MainLoop()
