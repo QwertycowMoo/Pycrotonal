@@ -17,7 +17,7 @@ class Synth(abc.ABC):
     _fm_index: float
     _reverb: float
     _distortion: float
-    _amp: float
+    _adsr: PyoObject
     _osc: PyoObject
 
     @property
@@ -72,25 +72,45 @@ class Synth(abc.ABC):
         if value < 0 or value > 22000:
             raise ValueError("This is outside the range of hearing!")
         self._freq = value
-        self._osc.setFreq(self._freq)
+        try:
+            self._osc.setFreq(self._freq)
+        except AttributeError:
+            # Oscillator has not been initialized before trying to set the multipler.
+            # This is expected behavior when initializing a synth
+            pass
 
     @property
-    def amp(self):
+    def adsr(self):
         """Amplitude (loudness)"""
-        return self._amp
+        return self._adsr
 
-    @amp.setter
-    def amp(self, value):
+    @adsr.setter
+    def adsr(self, value):
+        # TODO: Test this
         """amp setter, limits at 1"""
-        if value > 1:
-            raise ValueError("Amplitude cannot be larger than 1!")
-        self._amp = value
-        self._osc.setMul(self._amp)
+        if not isinstance(value, PyoObject):
+            raise ValueError("Amplitude must be a ADSR PyoObject")
+        self._adsr = value
+        try:
+            self._osc.setMul(self._adsr)
+        except AttributeError:
+            # Oscillator has not been initialized before trying to set the multipler.
+            # This is expected behavior when initializing a synth
+            pass
 
     def get_synth(self):
         """Gets the pyo synth object, will need to be implemented
         in the subclasses"""
         return self._osc
+
+    def play(self):
+        """Play the synth"""
+        self._osc.out()
+        self._adsr.play()
+
+    def stop(self):
+        """Stop the synth"""
+        self._adsr.stop()
 
     @abc.abstractmethod
     def get_harmonics(self):

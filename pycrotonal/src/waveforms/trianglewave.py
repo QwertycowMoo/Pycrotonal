@@ -6,14 +6,14 @@ from .synth import Synth, SAMPLE_RATE
 class TriangleWave(Synth):
     """Triangle waveform"""
 
-    def __init__(self, freq, amp):
+    def __init__(self, freq, adsr):
         """Constructor, uses RCOsc with 0 sharpness
         Freq is fundemental frequency
-        Amp is amplitude (loudness)"""
-        self._freq = freq
-        self._amp = amp
+        adsr is Adsr object to control attack decay sustain release"""
+        self.freq = freq
+        self.adsr = adsr
         self._wavetable = TriangleTable(order=20)
-        self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._amp)
+        self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._adsr)
 
     def get_harmonics(self):
         """Return an amplitude spread, 1/n up until nyquist limit"""

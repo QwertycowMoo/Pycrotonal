@@ -2,6 +2,7 @@
 import unittest
 import wx
 from wx.lib.agw.knobctrl import KnobCtrlEvent, EVT_KC_ANGLE_CHANGED
+from wx import UIActionSimulator
 from src.gui import PycrotonalFrame
 
 
@@ -18,6 +19,7 @@ class TestGUI(unittest.TestCase):
             size=wx.Size(700, 500),
             style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
         )
+        cls.keyinput = UIActionSimulator()
 
     @classmethod
     def tearDownClass(cls):

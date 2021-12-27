@@ -19,4 +19,5 @@ def find_scale(root, edo, num_octaves=1):
         freq = scale[i]
         freq = np.around(find_next_step(freq, edo), 4)
         scale.append(freq)
-    return scale
+    # convert to native float instead of numpy.float64
+    return [float(freq) for freq in scale]

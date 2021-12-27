@@ -47,7 +47,7 @@ SCALE_24_EDO = [
     Key.f11,
     KeyCode.from_char("-"),
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),
 ]
 
 SCALE_36_EDO = [
@@ -85,7 +85,7 @@ SCALE_36_EDO = [
     KeyCode.from_char("-"),
     KeyCode.from_char("["),
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),
     KeyCode.from_char("]"),
 ]
 
@@ -135,7 +135,7 @@ SCALE_48_EDO = [
     KeyCode.from_char("["),
     KeyCode.from_char("'"),
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),
     KeyCode.from_char("]"),
     KeyCode.from_char("\\"),  # \
 ]
@@ -197,7 +197,7 @@ SCALE_60_EDO = [
     KeyCode.from_char("'"),
     Key.shift_r,  # right shift
     Key.f12,
-    KeyCode.from_char("+"),
+    KeyCode.from_char("="),  # +
     KeyCode.from_char("]"),
     KeyCode.from_char("\\"),  # \
     Key.backspace,  # backspace
@@ -221,15 +221,13 @@ class Keyboard:
 
     def on_press(self, key):
         """on press handler"""
-        self.msg_queue.put(key)
-        try:
-            print("alphanumeric key {0} pressed".format(key.vk))
-        except AttributeError:
-            print("special key {0} pressed".format(key))
+        print("press")
+        self.msg_queue.put((key, "start"))
 
     def on_release(self, key):
         """on release handler"""
-        print("{0} released".format(key))
+        print("release")
+        self.msg_queue.put((key, "stop"))
         if key == keyboard.Key.esc:
             # Stop listener
             return False
@@ -237,6 +235,10 @@ class Keyboard:
     def start_listening(self):
         """Listen to keyboard"""
         self.listener.start()
+
+    def stop_listening(self):
+        """Stop listening to keyboard"""
+        self.listener.stop()
 
     def find_key_scale(self, edo):
         """returns the keys that will be associated with a frequency"""
@@ -253,17 +255,21 @@ class Keyboard:
         if edo <= 60:
             return SCALE_60_EDO[0:edo]
         raise ValueError("This is not a valid edo")
-        
-    def get_freq(self):
-        """Allows GUI to get frequency associated with keypress in a (kind of) async way"""
+
+    def get_scale(self):
+        """Return a list of tuples of keyboard key and frequency"""
+        return zip(self.key_scale, self.freq_scale)
+
+    def get_keypress(self):
+        """Allows GUI to get frequency associated with keypress in a (kind of) async way
+        returns the frequency, index of the keypress in its array, and key actually pressed"""
         try:
-            key = self.msg_queue.get(timeout=1)
+            key, msg = self.msg_queue.get(block=True)
         except Empty:
             print("empty")
             return -1
         try:
             index = self.key_scale.index(key)
-            return self.freq_scale[index]
-        except ValueError:
-            print("freq doesnt exist")
-            return -1
+            return (key, self.freq_scale[index], msg)
+        except ValueError as non_exist_freq:
+            raise ValueError("freq doesnt exist") from non_exist_freq

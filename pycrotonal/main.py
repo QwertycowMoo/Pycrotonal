@@ -12,13 +12,7 @@ if __name__ == "__main__":
     frame = PycrotonalFrame(
         None,
         title="Pycrotonal",
-        size=wx.Size(700, 700),
+        size=wx.Size(700, 800),
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
     )
     app.MainLoop()
-
-    # s = pyo.Server().boot()
-    # s.start()
-    # a = SineWave(440, .5)
-    # b = pyo.Disto(a.get_synth(), drive=.9, slope=0.9, mul=0.5).out()
-    # s.gui(locals())

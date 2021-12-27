@@ -8,3 +8,6 @@ Navigate to the `pycrotonal` file directory. Run `python -m tests.test_(package)
 
 # Windows Configuration
 With pynput, it will accept repeated keypresses if you hold it down. To keep computational costs low, I've turned on filter keys in Windows so that pressing a key will only press it once.
+
+# Parameters
+All parameters are unitless. They are only an approximation of the actual values given to the synth object

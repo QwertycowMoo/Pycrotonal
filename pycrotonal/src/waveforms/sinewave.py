@@ -9,13 +9,13 @@ from .synth import Synth
 class SineWave(Synth):
     """Sinewave waveform"""
 
-    def __init__(self, freq, amp):
+    def __init__(self, freq, adsr):
         """Constructor, uses the base harmonic table with 1 harmonic
         Freq is fundemental frequency
-        Amp is amplitude (loudness)"""
-        self._amp = amp
-        self._freq = freq
-        self._osc = Sine(freq=freq, mul=self._amp)
+        adsr is Adsr object to control attack decay sustain release"""
+        self.adsr = adsr
+        self.freq = freq
+        self._osc = Sine(freq=freq, mul=self.adsr)
         self._distortion = 1
         self._reverb = 0
 

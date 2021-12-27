@@ -7,15 +7,15 @@ from .synth import SAMPLE_RATE, Synth
 class SquareWave(Synth):
     """Square waveform"""
 
-    def __init__(self, freq, amp):
+    def __init__(self, freq, adsr):
         """Constructor, uses Squaretable to avoid aliasing
         Freq is fundemental frequency
-        Amp is amplitude (loudness)"""
-        self._freq = freq
-        self._amp = amp
+        adsr is Adsr object to control attack decay sustain release"""
+        self.freq = freq
+        self.adsr = adsr
         self._wavetable = SquareTable(order=25)
         # Sharp determines shape of waveform, 0 = triangle
-        self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._amp)
+        self._osc = Osc(table=self._wavetable, freq=self._freq, mul=self._adsr)
 
     def get_harmonics(self):
         """Return an amplitude spread, 1/n up until nyquist limit"""
